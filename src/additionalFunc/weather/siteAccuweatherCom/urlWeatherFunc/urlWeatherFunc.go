@@ -1,6 +1,9 @@
 package urlWeatherFunc
 
-import "regexp"
+import (
+	"fmt"
+	"regexp"
+)
 
 // Функция для уменьшения длины Url в кнопке из-за ограничений
 func CutUrlBtnChoose(str string) string {
@@ -22,7 +25,8 @@ func CutUrlBtnForecast(str string) string {
 
 // Получение полной версии Url
 func CompleteUrlBtnForecast(str string) string {
-	reg := regexp.MustCompile(`\w+/(.*)`)
+	fmt.Println("++++++++++", str)
+	reg := regexp.MustCompile(`\/(.*)`)
 	strGroup := reg.FindSubmatch([]byte(str))
 	urlForecast := "/en/ru/" + str + "/daily-weather-forecast/" + string(strGroup[1])
 	return urlForecast

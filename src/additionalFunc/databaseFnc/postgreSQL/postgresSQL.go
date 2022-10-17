@@ -4,18 +4,23 @@ import (
 	"TelegramBot/src/additionalFunc/databaseFnc"
 	"TelegramBot/src/additionalFunc/databaseFnc/dao"
 	"context"
-	"fmt"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"strconv"
 	"strings"
 )
 
 type postgreSQL struct {
-	connectToDB *pgx.Conn
+	connectToDB *pgxpool.Pool
 }
 
-func stopPanic() {
-	recover()
+func NewPostgreSQL() *postgreSQL {
+	databaseUrl := "postgres://postgres:postgrespw@host.docker.internal:55000/telegram"
+	connectToDB, err := pgxpool.New(context.Background(), databaseUrl)
+
+	if err != nil {
+		panic(err)
+	}
+	return &postgreSQL{connectToDB: connectToDB}
 }
 
 func (p *postgreSQL) WriteCityToDB(data *dao.CityToDatabase) error {
@@ -32,22 +37,15 @@ func (p *postgreSQL) WriteCityToDB(data *dao.CityToDatabase) error {
 
 func (p *postgreSQL) GetCityFromDB(userID *int64) (string, error) {
 	var city string
-	defer stopPanic()
+
 	err := p.connectToDB.QueryRow(context.Background(), "SELECT city  FROM lastsearch WHERE userid= '"+strconv.FormatInt(*userID, 10)+"'").Scan(&city)
 	if err != nil {
-		panic(err)
+		city = ""
 	}
+
 	return city, err
 }
 
-func NewPostgreSQL() *postgreSQL {
-	databaseUrl := "postgres://postgres:postgrespw@host.docker.internal:55000/telegram"
-	connectToDB, err := pgx.Connect(context.Background(), databaseUrl)
-	if err != nil {
-		panic(err)
-	}
-	return &postgreSQL{connectToDB: connectToDB}
-}
 func (p *postgreSQL) WritLogToDB(dataToDBLogs *databaseFnc.DataToDBLogs) error {
 	var err error
 
@@ -59,12 +57,9 @@ func (p *postgreSQL) WritLogToDB(dataToDBLogs *databaseFnc.DataToDBLogs) error {
 		"'" + dataToDBLogs.IncomingMsg + "'," +
 		"'" + dataToDBLogs.OutgoingMsg + "') ;"
 
-	fmt.Println(insertStmt)
 	_, err = p.connectToDB.Exec(context.Background(), insertStmt)
-
 	if err != nil {
 		panic(err)
 	}
-
 	return err
 }

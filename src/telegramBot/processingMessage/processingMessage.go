@@ -10,6 +10,6 @@ type Answer struct {
 }
 
 type NewMassage interface {
-	GetAnswerToMessage() *Answer
+	GetAnswerToMessage(chan *Answer)
 	WriteInBot(*Answer, *tgbotapi.BotAPI, *tgbotapi.Update)
 }

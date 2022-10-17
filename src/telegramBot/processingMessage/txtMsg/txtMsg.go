@@ -14,8 +14,8 @@ func NewTextType(txt *string) *TextType {
 	return &TextType{search: txt}
 }
 
-func (t *TextType) GetAnswerToMessage() *processingMessage.Answer {
-	return siteAccuweatherCom.AccuWeather(*t.search).GetWeatherAnswer("text")
+func (t *TextType) GetAnswerToMessage(answersChan chan *processingMessage.Answer) {
+	answersChan <- siteAccuweatherCom.AccuWeather(*t.search).GetWeatherAnswer("text")
 }
 
 func (t *TextType) WriteInBot(Answer *processingMessage.Answer, bot *tgbotapi.BotAPI, update *tgbotapi.Update) {

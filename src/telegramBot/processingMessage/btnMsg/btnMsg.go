@@ -17,19 +17,18 @@ func NewBtnType(title *string, data *string) *BtnType {
 	return &BtnType{titleButton: title, dataButton: data}
 }
 
-func (b BtnType) GetAnswerToMessage() *processingMessage.Answer {
+func (b BtnType) GetAnswerToMessage(answersChan chan *processingMessage.Answer) {
 	var answer processingMessage.Answer
 	switch *b.titleButton {
 	case "You need choose the exact name:":
-		return siteAccuweatherCom.AccuWeather(*b.dataButton).GetWeatherAnswer("btn")
+		answersChan <- siteAccuweatherCom.AccuWeather(*b.dataButton).GetWeatherAnswer("btn")
 	case "Need a forecast?":
-		return siteAccuweatherCom.AccuWeather(*b.dataButton).GetForecast()
+		answersChan <- siteAccuweatherCom.AccuWeather(*b.dataButton).GetForecast()
 	}
-	return &answer
+	answersChan <- &answer
 
 }
 func (b BtnType) WriteInBot(Answer *processingMessage.Answer, bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-
 	//выводим на печать в боте
 	//выводим на печать  название запрашиваемого города если есть
 	if (*Answer).Query != "" {

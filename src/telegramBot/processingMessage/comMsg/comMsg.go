@@ -17,17 +17,17 @@ func NewCommandType(command *string, arg *string) *CommandType {
 	return &CommandType{commandName: command, commandArg: arg}
 }
 
-func (c CommandType) GetAnswerToMessage() *processingMessage.Answer {
+func (c CommandType) GetAnswerToMessage(answersChan chan *processingMessage.Answer) {
 	var answer processingMessage.Answer
 
 	switch *c.commandName {
 	case "w":
-		return siteAccuweatherCom.AccuWeather(*c.commandArg).GetWeatherAnswer("text")
+		answersChan <- siteAccuweatherCom.AccuWeather(*c.commandArg).GetWeatherAnswer("text")
 	case "h":
 		answer.AnswerMsg = append(answer.AnswerMsg, tgbotapi.NewMessage(0, "Enter the command /w to get the result of the old success request"))
 	}
 
-	return &answer
+	answersChan <- &answer
 
 }
 func (c CommandType) WriteInBot(Answer *processingMessage.Answer, bot *tgbotapi.BotAPI, update *tgbotapi.Update) {

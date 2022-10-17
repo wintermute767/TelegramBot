@@ -47,21 +47,20 @@ func main() {
 		if update.CallbackQuery != nil {
 			incomingMassage = btnMsg.NewBtnType(&update.CallbackQuery.Message.Text, &update.CallbackQuery.Data)
 		}
+
 		//Запишим входящее значение в лог
 		go databaseInter.WritLogToDB(databaseFnc.NewDataToDBLogs(&update))
-
-		answers := incomingMassage.GetAnswerToMessage()
-		incomingMassage.WriteInBot(answers, bot, &update)
+		//создаем канал для результатов ответа
+		answerChan := make(chan *processingMessage.Answer)
+		go incomingMassage.GetAnswerToMessage(answerChan)
+		//ждем когда получим ответ из канала
+		answers := <-answerChan
+		go incomingMassage.WriteInBot(answers, bot, &update)
 		//Запишем в базу данных город который успешно нашли в этот раз для последующих поисков по команде
-		err := databaseInter.WriteCityToDB(dao.NewCityToDatabase(&update, &answers.Query))
-		if err != nil {
-			panic(err)
-		}
+		go databaseInter.WriteCityToDB(dao.NewCityToDatabase(&update, &(answers).Query))
 		//Запишим ответ в лог
-		databaseInter.WritLogToDB(databaseFnc.NewDataToDBLogs(&update, answers))
-		if err != nil {
-			panic(err)
-		}
+		go databaseInter.WritLogToDB(databaseFnc.NewDataToDBLogs(&update, answers))
+
 	}
 
 }
