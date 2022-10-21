@@ -32,12 +32,12 @@ func main() {
 				//если команда w то аргументом будет значение из базы данных
 				if com == "w" {
 					//для команды /w - ищем аргументы в БД
-					argFromDB, err := databaseInter.GetCityFromDB(&update.Message.Chat.ID)
+					/*argFromDB, err := databaseInter.GetCityFromDB(&update.Message.Chat.ID)
 					if err != nil {
 						panic(err)
 					} else {
 						arg = argFromDB
-					}
+					}*/
 				}
 				incomingMassage = comMsg.NewCommandType(&com, &arg)
 			} else {

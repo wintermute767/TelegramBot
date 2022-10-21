@@ -5,6 +5,7 @@ import (
 	"TelegramBot/src/additionalFunc/databaseFnc/dao"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -14,7 +15,7 @@ type postgreSQL struct {
 }
 
 func NewPostgreSQL() *postgreSQL {
-	databaseUrl := "postgres://postgres:postgrespw@host.docker.internal:55000/telegram"
+	databaseUrl := "postgres://" + os.Getenv("POSTGRES_USER") + ":" + os.Getenv("POSTGRES_PASSWORD") + "@" + os.Getenv("POSTGRES_HOSTNAME") + ":" + os.Getenv("POSTGRES_PORT") + "/" + os.Getenv("POSTGRES_DB")
 	connectToDB, err := pgxpool.New(context.Background(), databaseUrl)
 
 	if err != nil {
