@@ -15,7 +15,7 @@ type postgreSQL struct {
 }
 
 func NewPostgreSQL() *postgreSQL {
-	databaseUrl := "postgres://" + os.Getenv("POSTGRES_USER") + ":" + os.Getenv("POSTGRES_PASSWORD") + "@" + os.Getenv("POSTGRES_HOSTNAME") + ":" + os.Getenv("POSTGRES_PORT") + "/" + os.Getenv("POSTGRES_DB")
+	databaseUrl := os.Getenv("POSTGRES_CONNECT")
 	connectToDB, err := pgxpool.New(context.Background(), databaseUrl)
 
 	if err != nil {
